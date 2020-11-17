@@ -126,13 +126,21 @@ public class ZookeeperRegistry extends FailbackRegistry {
         }
     }
 
+    /**
+     * 消费者去订阅，获取服务提供者
+     *
+     * @param url
+     * @param listener
+     */
     @Override
     public void doSubscribe(final URL url, final NotifyListener listener) {
         try {
             if (ANY_VALUE.equals(url.getServiceInterface())) {
                 String root = toRootPath();
+
                 ConcurrentMap<NotifyListener, ChildListener> listeners =
                     zkListeners.computeIfAbsent(url, k -> new ConcurrentHashMap<>());
+
                 ChildListener zkListener = listeners.computeIfAbsent(listener, k -> (parentPath, currentChilds) -> {
                     for (String child : currentChilds) {
                         child = URL.decode(child);
